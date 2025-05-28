@@ -1,0 +1,17 @@
+Story,Task,Estimate min (hr),Estimate max (hr),Actual,Comment
+Planificación,Análisis del desafío,1,1.75,,"Leer el PDF, entender datasets, API, objetivos y entregables."
+,División de tareas y estimación inicial,1.5,2.5,,"Crear plan de trabajo, cargar tareas y tiempos estimados al CSV."
+Preparación del entorno,Configurar entorno virtual y dependencias,1,1.75,,"Crear env, instalar pandas, LLMs, RAG libs, etc."
+,Cargar y explorar Product Dataset,1.5,2.5,,"Leer CSV, mostrar estadísticas, identificar campos útiles."
+,Estudiar e integrar API mock,1.5,2.5,,"Ver funciones disponibles, testear llamada básica."
+Implementación,Implementar RAG para productos,3.5,7.25,,"Indexar datos, vectorizar, buscar, generar respuesta."
+,Conectar API para pedidos por Customer ID,2,3.5,,Extraer y mostrar info formateada.
+,Unificar lógica del chatbot,2,3.5,,Recibir texto → decidir fuente (producto/API) → responder.
+Testeo y documentación,Generar 10 Q&A de productos,1,2,,"Preguntas variadas, con respuestas generadas por chatbot."
+,Generar 10 Q&A de pedidos,1,2,,Usar API mock para responder como chatbot.
+,Escribir README,1,2,,"Cómo correr el proyecto, arquitectura, trade-offs, etc."
+,"Completar columna ""Actual Time"" del CSV",0.5,0.75,,Medir y comparar con estimación.
+Bonus (opcional),"Crear interfaz (Streamlit, Gradio o HTML)",2,3.5,,UI mínima para probar el chatbot.
+,"Subir a la nube (Streamlit Cloud, HF Spaces)",1.5,2.75,,Hosting del chatbot.
+,"Comparar modelos (GPT, Mistral, etc.)",2,3.5,,"Evaluar precisión, costo, latencia."
+Tiempo total,,23,41.75,0,

@@ -43,3 +43,32 @@ class OrderAPI:
             return {"orders": [], "error": f"Request failed: {str(e)}"}
         except Exception as e:
             return {"orders": [], "error": f"Unexpected error: {str(e)}"}
+        
+    def get_order_by_priority(self, priority: str) -> Dict[str, Any]:
+        """
+        Get orders by priority from the mock API.
+        
+        Args:
+            priority: The priority level to filter by
+            
+        """
+        try:
+            url = f"{self.api_url}order-priority/{priority}"
+            response = requests.get(url)
+            
+            if response.status_code == 200:
+                print(response.json())
+                data = response.json()
+                if isinstance(data, dict) and "error" in data:
+                    return {"orders": [], "error": data["error"]}
+                return {"orders": data, "error": None}
+            
+            return {
+                "orders": [], 
+                "error": f"API request failed with status code: {response.status_code}"
+            }
+            
+        except requests.RequestException as e:
+            return {"orders": [], "error": f"Request failed: {str(e)}"}
+        except Exception as e:
+            return {"orders": [], "error": f"Unexpected error: {str(e)}"}

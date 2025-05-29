@@ -1,6 +1,7 @@
 import os
 from typing import Optional, Dict, Any, List
 from dotenv import load_dotenv
+# from langchain_mistralai import ChatMistralAI
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, BaseMessage, ToolMessage
 from langchain.agents import initialize_agent, AgentType
@@ -43,9 +44,16 @@ class EcommerceAssistant:
         # Initialize OrderAPI
         self.order_api = OrderAPI()
         
-        # Initialize Gemini model
+        # Initialize Mistral model
+        # self.llm = ChatMistralAI(
+        #     model="mistral-large-latest",
+        #     mistral_api_key=os.getenv("MISTRAL_API_KEY"),
+        #     temperature=0.0
+        # )
+
+                # Initialize Gemini model
         self.llm = ChatGoogleGenerativeAI(
-            model="gemini-1.5-flash",
+            model="gemini-2.0-flash",
             google_api_key=os.getenv("GOOGLE_API_KEY"),
             temperature=0.0
         )
@@ -60,7 +68,7 @@ class EcommerceAssistant:
             Use this when the user asks about specific products or wants recommendations."""
             try:
                 indices, scores = search_index(query, k=5)
-                productos = df_products.iloc[indices][['title', 'price', 'average_rating']]
+                productos = df_products.iloc[indices][['main_category', 'title', 'price', 'average_rating']]
                 productos['relevancia'] = scores
                 tool_response = f"Products found:\n{productos.to_string()}"
                 return tool_response
@@ -95,6 +103,38 @@ class EcommerceAssistant:
         
         self.tools.append(get_order)
         
+        @tool
+        def get_orders_by_priority(priority: str) -> str:
+            """Get orders by priority level.
+            Input should be one of: 'high', 'medium', 'low', 'critical'.
+            Returns a list of orders with the specified priority level.
+            Use this when the user asks about orders with specific priority levels."""
+            try:
+                # Normalizar la prioridad a minúsculas
+                priority = priority.lower()
+                valid_priorities = ['high', 'medium', 'low', 'critical']
+                
+                if priority not in valid_priorities:
+                    return f"Invalid priority level. Please use one of: {', '.join(valid_priorities)}"
+                
+                result = self.order_api.get_order_by_priority(priority)
+                if result["error"]:
+                    tool_response = f"Error retrieving orders: {result['error']}"
+                    return tool_response
+                if not result["orders"]:
+                    tool_response = f"No orders found with priority level: {priority}"
+                    return tool_response
+                
+                # Formatear la respuesta para mejor legibilidad
+                orders = result["orders"]
+                tool_response = f"Orders with {priority} priority:\n\n" + f"\n\n {orders}"
+                return tool_response
+            except Exception as e:
+                tool_response = f"Error processing priority request: {str(e)}"
+                return tool_response
+        
+        self.tools.append(get_orders_by_priority)
+        
         # System prompt for the agent
         self.system_prompt = """You are an expert e-commerce customer service assistant.
         Your goal is to help users with their e-commerce related questions.
@@ -102,22 +142,15 @@ class EcommerceAssistant:
         Instructions:
         1. Carefully analyze the user's query and the conversation history
         2. If the query is about products, use the search_products tool to find relevant products
-        3. If the query is about order status or details, use the get_order tool with the customer ID
-        4. Present product information in a clear and organized manner, including:
-           - Product names
-           - Prices
-           - Ratings
-           - Relevance scores
-        5. For order information, present:
-           - Order details
-           - Status
-           - Any relevant error messages if the order is not found
-        6. If no products are found or the results are not satisfactory:
+        3. If the query is about order status or details:
+           - For specific customer orders, use the get_order tool with the customer ID and give all the information about the order
+           - For orders by priority level, use the get_orders_by_priority tool
+        4. If no products are found or the results are not satisfactory:
            - Suggest alternative search terms
            - Ask for more specific information
-        7. For non-product queries, provide helpful and accurate information
-        8. Always maintain a professional and friendly tone
-        9. Use the conversation history to:
+        5. For non-product queries, provide helpful and accurate information
+        6. Always maintain a professional and friendly tone
+        7. Use the conversation history to:
            - Refer to previous questions or products mentioned
            - Maintain context about user preferences
            - Provide more relevant follow-up suggestions
@@ -128,13 +161,9 @@ class EcommerceAssistant:
         - If you don't know something, be honest about it
         - Suggest relevant alternatives when appropriate
         - Keep the conversation focused on e-commerce topics
-        - When showing products, always mention price and rating
         - When showing order information, present it in a clear and organized way
         - If the user's query is unclear, ask for more details
-        
-        IMPORTANT: 
-        - When using the search_products tool, you MUST include the phrase "I have used the search tool to find these products:" before showing the results.
-        - When using the get_order tool, you MUST include the phrase "I have retrieved the order information:" before showing the results."""
+        - For priority-based queries, ensure to use the correct priority levels: high, medium, low, critical"""
         
         self.messages.append(SystemMessage(content=self.system_prompt))
         # Initialize the agent
@@ -145,8 +174,7 @@ class EcommerceAssistant:
             verbose=False,
             handle_parsing_errors=True,
             system_message=self.system_prompt,
-            max_iterations=3,
-            return_intermediate_steps=True
+            return_intermediate_steps=False,
         )
     
     def process_query(self, query: str) -> str:
@@ -155,8 +183,8 @@ class EcommerceAssistant:
             self.messages.append(HumanMessage(content=query))
             
             # Use the agent to process the query and get only the final answer
+            #result = self.agent.invoke({"input": self.messages})
             result = self.agent.invoke({"input": self.messages})
-
             #print(result['intermediate_steps'])
             # Add assistant response to history
             self.messages.append(AIMessage(content=result["output"]))

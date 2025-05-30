@@ -14,7 +14,7 @@ An intelligent chatbot that uses RAG (Retrieval Augmented Generation) to answer 
 
 1. Clone the repository:
 ```bash
-git clone [REPO_URL]
+git clone https://github.com/dburckhardt/Ecommerce_Assistant_Challenge.git
 cd Ecommerce_Assistant_Challenge
 ```
 

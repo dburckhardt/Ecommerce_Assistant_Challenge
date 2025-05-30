@@ -11,7 +11,7 @@ Testing & Docs,Generate 10 product Q&A,1,2,2,"Varied questions, responses genera
 ,Generate 10 order Q&A,1,2,2,Use mock API to respond as chatbot.
 ,Write README,1,2,1.5,"How to run the project, architecture, trade-offs, etc."
 ,"Complete ""Actual Time"" column in CSV",0.5,0.75,0.5,Measure and compare with estimate.
-Bonus (Optional),"Create interface (Streamlit, Gradio, or HTML)",2,3.5,,Minimal UI to test chatbot.
+Bonus (Optional),"Create interface (Streamlit, Gradio, or HTML)",2,3.5,2,Minimal UI to test chatbot.
 ,"Upload to the cloud (Streamlit Cloud, HF Spaces)",1.5,2.75,,Host the chatbot.
 ,"Compare models (GPT, Mistral, etc.)",2,3.5,,"Evaluate precision, cost, latency."
-Total Time,,23,41.75,27.75,
+Total Time,,23,41.75,29.75,

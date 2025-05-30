@@ -8,6 +8,7 @@ An intelligent chatbot that uses RAG (Retrieval Augmented Generation) to answer 
 - Integration with mock API for product and order data
 - Specific tools for order queries by ID and priority
 - LLM-based product ranking system
+- Interactive web interface using Streamlit
 
 ## Installation
 
@@ -29,7 +30,32 @@ cp .env.example .env
 # Edit .env with the necessary credentials
 ```
 
+4. Start the mock API:
+```bash
+cd mock_api
+pip install -r requirements.txt
+uvicorn mock_api:app --reload --port 8000
+```
+The mock API will be available at http://localhost:8000
+
 ## Usage
+
+### Web Interface (Streamlit)
+
+1. Make sure the mock API is running (see Installation step 4)
+2. Start the Streamlit app:
+```bash
+streamlit run src/streamlit_app.py
+```
+
+3. Open your browser at the URL shown in the terminal (usually http://localhost:8501)
+
+The Streamlit interface provides:
+- A modern chat interface
+- Real-time conversation history
+- Example questions in the sidebar
+- Clear conversation button
+- Automatic assistant initialization
 
 ### Notebook Interface
 
@@ -55,7 +81,8 @@ Ecommerce_Assistant_Challenge/
 ├── src/                    # Project source code
 │   ├── chatbot/           # Main chatbot module
 │   ├── api_client.py      # Client for API interaction
-│   └── rag.py             # RAG implementation
+│   ├── rag.py             # RAG implementation
+│   └── streamlit_app.py   # Streamlit web interface
 ├── mock_api/              # Mock API for development
 ├── environment.yml        # Conda environment configuration
 └── .env                   # Environment variables (not versioned)

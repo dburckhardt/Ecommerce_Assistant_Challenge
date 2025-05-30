@@ -195,6 +195,10 @@ class EcommerceAssistant:
             error_msg = f"sorry, there was an error processing your query: {str(e)}"
             self.messages.append(AIMessage(content=error_msg))
             return error_msg
+        
+    def reset_messages(self):
+        self.messages = []
+        self.messages.append(SystemMessage(content=self.system_prompt))
 
 def chatbot_response(
     query: str,
@@ -204,4 +208,7 @@ def chatbot_response(
     Wrapper function to maintain compatibility with existing code
     """
     return assistant.process_query(query)
+
+def clear_conversation(assistant: EcommerceAssistant):
+    assistant.reset_messages()
     
